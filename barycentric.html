@@ -1,0 +1,33 @@
+<!--Programmer: Chris Tralie!-->
+<!--Purpose: Front end point chooser / debugger for triangle barycenter function!-->
+<html>
+<head>
+    <meta charset=utf-8></meta>
+    <script src = "gl-matrix-min.js"></script>
+    <script src = "dat.gui.min.js"></script>
+    <script src = "geomprimitives.js"></script>
+    <script src = "guitools.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<h2><a name = "barycenter">Triangle Weighted Averages</a></h2>
+<p>
+    In the GUI below, choose three points in the plane the plane (z = 0) to test make a triangle.  Left click to select the points, and right click to delete the most recently selected point.  Then, adjust the sliders on the right to take different vector weighted averages of the three triangle points.
+</p>
+
+<p>
+    <b>NOTE:</b> This GUI runs in the plane for simplicity (all z coordinates are zero), but the same phenomenon will happen in 3D.
+</p>
+
+<canvas id = "barycanvas" width = "600" height = "600" style="border:1px solid #000000;">
+</canvas>
+
+
+<script>
+    let gui = new BarycentricGUI();
+</script>
+
+
+</body>
+</html>
