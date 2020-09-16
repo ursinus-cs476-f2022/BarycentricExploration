@@ -198,9 +198,11 @@ class BarycentricGUI {
     ctx.clearRect(0, 0, W, H);
 
     //Draw triangle points
+    let vertexNames = ["a", "b", "c"];
     for (let i = 0; i < Ps.length; i++) {
         ctx.fillStyle = PLOT_COLORS["C"+i];
         ctx.fillRect(Ps[i][0]-dW, Ps[i][1]-dW, dW*2+1, dW*2+1);
+        ctx.fillText(vertexNames[i], Ps[i][0] + 10, Ps[i][1]);
     }
 
     //Draw points inside
@@ -227,41 +229,172 @@ class BarycentricGUI {
           if (evt.button == 4) clickType = "MIDDLE";
       }
       
-      if (this.selectingTriangle) {
-          if (clickType == "LEFT") {
-              //Add a point
-              if (Ps.length < 3) {
-                  Ps.push(vec3.fromValues(X, Y, 0));
-              }
-              else {
-                  //If there's already a third point, simply replace it
-                  Ps[2] = vec3.fromValues(X, Y, 0);
-              }
+      if (clickType == "LEFT") {
+          //Add a point
+          if (Ps.length < 3) {
+              Ps.push(vec3.fromValues(X, Y, 0));
           }
           else {
-              //Remove point
-              if (Ps.length > 0) {
-                  Ps.pop();
-              }
+              //If there's already a third point, simply replace it
+              Ps[2] = vec3.fromValues(X, Y, 0);
           }
-          if (Ps.length < 3) {
-            this.Qs = [];
+      }
+      else {
+          //Remove point
+          if (Ps.length > 0) {
+              Ps.pop();
           }
-          //Update text describing point coordinates
-          for (let i = 0; i < 3; i++) {
-              let str = "Not Selected";
-              if (i < Ps.length) {
-                  str = "(" + Ps[i][0].toFixed(0) + "," + Ps[i][1].toFixed(0) + ")";
-              }
-              if (i == 0) {
-                this.a = str;
-              }
-              else if (i == 1) {
-                this.b = str;
-              }
-              else {
-                this.c = str;
-              }
+      }
+      if (Ps.length < 3) {
+        this.Qs = [];
+      }
+      //Update text describing point coordinates
+      for (let i = 0; i < 3; i++) {
+          let str = "Not Selected";
+          if (i < Ps.length) {
+              str = "(" + Ps[i][0].toFixed(0) + "," + Ps[i][1].toFixed(0) + ")";
+          }
+          if (i == 0) {
+            this.a = str;
+          }
+          else if (i == 1) {
+            this.b = str;
+          }
+          else {
+            this.c = str;
+          }
+      }
+      this.repaint();
+  }
+}
+
+
+
+
+class TriangleDivisionGUI {
+  constructor() {
+    this.Ps = []; //Points [a, b, c, d]
+    this.setupMenu();
+    this.setupCanvas();
+  }
+
+  setupMenu() {
+    let menu = new dat.GUI();
+    this.menu = menu;
+    this.a = "Not Selected";
+    this.b = "Not Selected";
+    this.c = "Not Selected";
+    this.d = "Not Selected";
+    menu.add(this, "a").listen();
+    menu.add(this, "b").listen();
+    menu.add(this, "c").listen();
+    menu.add(this, "d").listen();
+  }
+
+  /**
+   * Setup the 2D canvas for selecting the triangle
+   */
+  setupCanvas() {
+    let canvas = document.getElementById('barycanvas');
+    let ctx = canvas.getContext("2d"); //For drawing
+    ctx.font = "16px Arial";
+    this.canvas = canvas;
+    this.ctx = ctx;
+    //Need this to disable that annoying menu that pops up on right click
+    canvas.addEventListener("contextmenu", function(e){ e.stopPropagation(); e.preventDefault(); return false; }); 
+    canvas.addEventListener("mousedown", this.selectVec.bind(this));
+    canvas.addEventListener("touchstart", this.selectVec.bind(this)); //Works on mobile devices!
+    this.repaint(); 
+  }
+
+  /**
+   * Draw the triangle and the point inside it, as well
+   * as the barycentric coordinates at each point
+   */
+  repaint() {
+    let canvas = this.canvas;
+    let ctx = this.ctx;
+    let Ps = this.Ps;
+    let Qs = this.Qs;
+    let dW = 5;
+    let W = canvas.width;
+    let H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    //Draw triangle points and point inside
+    let vertexNames = ["a", "b", "c", "d"];
+    for (let i = 0; i < Ps.length; i++) {
+        ctx.fillStyle = PLOT_COLORS["C"+i];
+        ctx.fillRect(Ps[i][0]-dW, Ps[i][1]-dW, dW*2+1, dW*2+1);
+        ctx.fillText(vertexNames[i], Ps[i][0] + 10, Ps[i][1]);
+    }
+
+    // Draw triangle edges
+    ctx.fillStyle = "#000000";
+    for (let i = 0; i < Ps.length; i++) {
+        for (let j = i+1; j < Ps.length; j++) {
+          ctx.beginPath();
+          ctx.moveTo(Ps[i][0], Ps[i][1]);
+          ctx.lineTo(Ps[j][0], Ps[j][1]);
+          ctx.stroke();    
+        }
+    }
+
+    
+  }
+
+  selectVec(evt) {
+      let mousePos = getMousePos(this.canvas, evt);
+      let Ps = this.Ps;
+      let X = mousePos.X;
+      let Y = mousePos.Y
+      let clickType = "LEFT";
+      evt.preventDefault();
+      if (evt.which) {
+          if (evt.which == 3) clickType = "RIGHT";
+          if (evt.which == 2) clickType = "MIDDLE";
+      }
+      else if (evt.button) {
+          if (evt.button == 2) clickType = "RIGHT";
+          if (evt.button == 4) clickType = "MIDDLE";
+      }
+      
+      if (clickType == "LEFT") {
+          //Add a point
+          if (Ps.length < 4) {
+              Ps.push(vec3.fromValues(X, Y, 0));
+          }
+          else {
+              //If there's already a fourth point, simply replace it
+              Ps[3] = vec3.fromValues(X, Y, 0);
+          }
+      }
+      else {
+          //Remove point
+          if (Ps.length > 0) {
+              Ps.pop();
+          }
+      }
+      if (Ps.length < 3) {
+        this.Qs = [];
+      }
+      //Update text describing point coordinates
+      for (let i = 0; i < 4; i++) {
+          let str = "Not Selected";
+          if (i < Ps.length) {
+              str = "(" + Ps[i][0].toFixed(0) + "," + Ps[i][1].toFixed(0) + ")";
+          }
+          if (i == 0) {
+            this.a = str;
+          }
+          else if (i == 1) {
+            this.b = str;
+          }
+          else if (i == 2) {
+            this.c = str;
+          }
+          else {
+            this.d = str;
           }
       }
       this.repaint();

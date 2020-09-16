@@ -1,0 +1,50 @@
+<!--Programmer: Chris Tralie!-->
+<!--Purpose: Front end point chooser / debugger for triangle barycenter function!-->
+<html>
+<head>
+    <meta charset=utf-8></meta>
+    <script src = "gl-matrix-min.js"></script>
+    <script src = "dat.gui.min.js"></script>
+    <script src = "geomprimitives.js"></script>
+    <script src = "guitools.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<h2>Computing Barycentric Coordinates</h2>
+<p>
+    In the GUI below, choose three points in the plane the plane (z = 0) to test make a triangle.  Left click to select the points, and right click to delete the most recently selected point.  Once the fourth point is selected, that triangles will be drawn.  The barycentric coordinates can then be computed as follows
+</p>
+
+<p>
+    <b>NOTE:</b> This GUI runs in the plane for simplicity (all z coordinates are zero), but the same phenomenon will happen in 3D.
+</p>
+
+<canvas id = "barycanvas" width = "600" height = "600" style="border:1px solid #000000;">
+</canvas>
+
+
+<script>
+    let gui = new TriangleDivisionGUI();
+</script>
+
+<HR>
+    <h2>Area Ratios</h2>
+    <p>
+        The ratios of the areas of triangles can be used to compute the barycentric coordinates.  If the point <b>d</b> is inside the triangle <b>abc</b>, then the following rules apply:
+    </p>
+        <h3>
+            \[  \alpha = \text{area} \frac{\bigtriangleup bcd}{\bigtriangleup abc}, \beta = \text{area} \frac{\bigtriangleup acd}{\bigtriangleup abc}, \gamma = \text{area} \frac{\bigtriangleup abd}{\bigtriangleup abc} \]
+        </h3>
+        Notice how in this case, alpha + beta + gamma = 1
+    <p>
+        If the point is outside the triangle (either in the same plane but outside, or above or below the plane of the triangle), then 
+
+        <h3>
+           \[  \text{area} ({\bigtriangleup abc}) <  \text{area} ({\bigtriangleup abd}) + \text{area} ({\bigtriangleup acd}) + \text{area} ({\bigtriangleup bcd}) \]
+        </h3>
+    </p>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>
